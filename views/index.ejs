@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <title>trap.manu.moe</title>
+
+    <!-- Icons -->
+    <!-- The following icons can be replaced with your own, they are used by desktop and mobile browsers -->
+    <link rel="shortcut icon" href="assets/media/favicons/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/media/favicons/favicon-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/media/favicons/apple-touch-icon-180x180.png">
+    <!-- END Icons -->
+
+    <!-- Stylesheets -->
+    <!-- Page JS Plugins CSS -->
+    <link rel="stylesheet" href="assets/js/plugins/summernote/summernote-bs4.css">
+
+    <!-- Fonts and Dashmix framework -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,600,700">
+    <link rel="stylesheet" id="css-main" href="assets/css/dashmix.min.css">
+
+    <!-- You can include a specific file from css/themes/ folder to alter the default color theme of the template. eg: -->
+    <!-- <link rel="stylesheet" id="css-theme" href="assets/css/themes/xwork.min.css"> -->
+    <link rel="stylesheet" id="css-theme" href="assets/css/themes/xplay.min.css">
+    <!-- END Stylesheets -->
+</head>
+
+<body>
+
+    <div id="page-container" class="sidebar-o sidebar-dark side-scroll">
+
+        <nav id="sidebar" aria-label="Main Navigation">
+            <!-- Side Header -->
+            <div class="content-header">
+                <!-- Logo -->
+                <a class="link-fx font-size-lg text-dual" href="index.html">
+                    <span class="smini-visible">
+                            <span class="text-white-75">D</span><span class="text-white">M</span>
+                    </span>
+                    <span class="smini-hidden">
+                            <span class="text-white-75">Trap</span>Manu
+                    </span>
+                </a>
+                <!-- END Logo -->
+
+                <!-- Options -->
+                <div>
+                    <!-- Close Sidebar, Visible only on mobile screens -->
+                    <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
+                    <a class="d-lg-none text-white ml-2" data-toggle="layout" data-action="sidebar_close" href="javascript:void(0)">
+                        <i class="fa fa-times-circle"></i>
+                    </a>
+                    <!-- END Close Sidebar -->
+                </div>
+                <!-- END Options -->
+            </div>
+            <!-- END Side Header -->
+
+            <!-- Side Actions -->
+            <div class="content-side content-side-full bg-black-10 smini-hidden">
+                <button id="clearMessage" type="button" class="btn btn-block btn-hero-sm btn-hero-primary mb-3">
+                         Clear Messages
+                    </button>
+            </div>
+            <!-- END Side Actions -->
+        </nav>
+        <!-- END Sidebar -->
+
+        <!-- Main Container -->
+        <main id="main-container">
+
+            <!-- Page Content -->
+            <div class="row no-gutters flex-lg-10-auto">
+                <div class="col-lg-5 col-xl-3 h100-scroll">
+                    <div class="content">
+                        <!-- Toggle Side Content -->
+                        <div class="row gutters-tiny d-lg-none push">
+                            <div class="col-6">
+                                <!-- Toggle Sidebar -->
+                                <!-- Layout API, functionality initialized in Template._uiApiLayout()-->
+                                <button type="button" class="btn btn-block btn-hero-sm btn-hero-primary" data-toggle="layout" data-action="sidebar_toggle">
+                                        <i class="fa fa-bars mr-1"></i> Menu
+                                    </button>
+                            </div>
+                            <div class="col-6">
+                                <!-- Class Toggle, functionality initialized in Helpers.coreToggleClass() -->
+                                <button type="button" class="btn btn-block btn-hero-sm btn-hero-dark" data-toggle="class-toggle" data-target="#side-content" data-class="d-none">
+                                        <i class="fa fa-envelope mr-1"></i> Messages
+                                    </button>
+                            </div>
+                        </div>
+                        <!-- END Toggle Side Content -->
+
+                        <!-- Side Content -->
+                        <div id="side-content" class="d-none d-lg-block push">
+                            <!-- Search Messages -->
+
+
+                            <!-- Messages -->
+                            <div id="messages" class="list-group font-size-sm">
+                            </div>
+                            <!-- END Messages -->
+                        </div>
+                        <!-- END Side Content -->
+                    </div>
+                </div>
+                <div class="col-lg-7 col-xl-9 h100-scroll bg-body-dark">
+                    <!-- Main Content -->
+                    <div class="content" id="email">
+                        <!-- Message -->
+                        <!-- END Message -->
+                    </div>
+                    <!-- END Main Content -->
+                </div>
+            </div>
+            <!-- END Page Content -->
+
+        </main>
+        <!-- END Main Container -->
+    </div>
+    <!-- END Page Container -->
+    <script src="assets/js/dashmix.core.min.js"></script>
+    <script src="assets/js/dashmix.app.min.js"></script>
+
+    <!-- Page JS Plugins -->
+    <script src="assets/js/plugins/summernote/summernote-bs4.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- Page JS Helpers (Summernote plugin) -->
+    <script>
+        var emails = [];
+
+        jQuery(function() {
+            Dashmix.helpers('summernote');
+
+            var socket = io();
+
+            socket.on('email', (data) => {
+                var index = emails.push(data) - 1;
+                console.log(data);
+                $('#messages').append(`<a data-index="${index}" class="list-group-item list-group-item-action email" href="javascript:void(0)"><span class="badge badge-pill badge-primary m-1 float-right">1</span><p class="font-size-h6 font-w700 mb-0">${data.email.subject}</p><p class="text-muted mb-2">${data.email.text}</p><p class="font-size-sm text-muted mb-0"><strong>${data.email.from.value[0].name}</strong>, ${data.timeStamp}</p></a>`)
+
+                $('.email').click((event) => {
+                    displayMail(emails[$(event.currentTarget).data('index')])
+                })
+            })
+
+            $('#clearMessage').click(() => {
+                socket.emit('clearMessage');
+                $('#messages').empty();
+                $('#email').html('');
+            })
+
+            function displayMail(data) {
+                $('#email').html(`<div class="block block-fx-pop"><div class="block-content block-content-sm block-content-full bg-body-light"><div class="media py-3"><div class="mr-3 ml-2 overlay-container overlay-right"><img class="img-avatar img-avatar48" src="assets/media/avatars/avatar3.jpg" alt=""><i class="far fa-circle text-white overlay-item font-size-sm bg-success rounded-circle"></i></div><div class="media-body"><div class="row"><div class="col-sm-7"><a class="font-w600 link-fx" href="javascript:void(0)">${data.email.from.value[0].name}</a><div class="font-size-sm text-muted">${data.email.from.value[0].address}</div></div><div class="col-sm-5 d-sm-flex align-items-sm-center"><div class="font-size-sm font-italic text-muted text-sm-right w-100 mt-2 mt-sm-0"><p class="mb-0">${data.timeStamp}</p><p class="mb-0">12:30</p></div></div></div></div></div></div><div class="block-content pb-3">${data.email.html}</div></div></div>`);
+            }
+        });
+    </script>
+</body>
+
+</html>
