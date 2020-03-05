@@ -1,0 +1,1 @@
+# TrapManu - mailtrap alternative - selfhosted

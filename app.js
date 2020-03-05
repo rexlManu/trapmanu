@@ -54,8 +54,6 @@ smtpServer.onData = (stream, session, callback) => {
     streamToString(stream).then((source) => {
         simpleParser(source, {})
             .then(email => {
-
-
                 var data = {
                     timeStamp,
                     email,
