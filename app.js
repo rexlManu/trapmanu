@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var moment = require('moment');
 var fs = require('fs');
 var app = express();
@@ -49,8 +48,6 @@ smtpServer.onData = (stream, session, callback) => {
         rcptTo += `${rcpt.address}_`;
     });
     rcptTo = rcptTo.substr(0, rcptTo.length - 1);
-    //var fileName = `./emails/${timeStamp}_${session.envelope.mailFrom ? session.envelope.mailFrom.address : "error"}_to_${rcptTo}.txt`;
-
     streamToString(stream).then((source) => {
         simpleParser(source, {})
             .then(email => {
@@ -67,7 +64,6 @@ smtpServer.onData = (stream, session, callback) => {
     })
 
     stream.on('end', callback);
-
 };
 
 function streamToString(stream) {
@@ -83,9 +79,7 @@ smtpServer.on("error", err => {
     console.log("Error %s", err.message);
 });
 
-// smtpServer.listen(465);
 smtpServer.listen(smtpConfig.port);
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
